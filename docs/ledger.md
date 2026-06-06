@@ -89,6 +89,22 @@ integer microunits, deterministically sorted account balances in integer
 microunits, credited/debited/net supply totals, hash-chain verification, and
 fixed-supply conservation verification.
 
+Phase 2B adds read-only Merkle artifacts for those snapshot balances:
+
+```bash
+python scripts/export_snapshot_merkle.py > ledger-snapshot-root.json
+python scripts/export_snapshot_merkle.py --account github:alice > ledger-snapshot-proof.json
+python scripts/export_snapshot_merkle.py --schema > ledger-snapshot-merkle.schema.json
+```
+
+The Merkle root object is versioned, uses SHA-256, and binds the account tree to
+the snapshot ledger anchor: latest ledger sequence and latest entry hash. Account
+leaves are versioned canonical JSON objects with an account id and integer
+`balance_microunits`; internal nodes are also domain-separated canonical JSON
+objects. Empty, single-account, and multi-account snapshots have deterministic
+roots, and proof verification rejects tampered accounts, balances, indexes,
+sibling hashes, directions, tree size, root hashes, or ledger anchors.
+
 Snapshot `proposal_validation` is intentionally `partial`: the exporter verifies
 committed ledger entries, the hash chain, and fixed-supply conservation, but it
 does not replay every historical treasury proposal, challenge, or governance
